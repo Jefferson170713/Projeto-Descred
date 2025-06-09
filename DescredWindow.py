@@ -255,13 +255,14 @@ class SearchWindow(QDialog):
 
         # Tabela para exibir os resultados
         self.table = QTableWidget()
-        self.table.setColumnCount(15)  # Define 15 colunas
-        self.table.setHorizontalHeaderLabels([
-            'CD_PROTOCOLO', 'CD_SERV_HONORARIO', 'CD_PROCEDIMENTO_TUSS', 'CD_ANO',
-            'DT_STATUS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'REDE',
-            'VL_PROPOSTO', 'VL_DEFLATOR', 'VL_DEFLATOR_UCO', 'VL_FILME_PROPOSTO',
-            'CD_LOCAL', 'FL_URGENCIA', 'FL_ELETIVA'
-        ])
+        self.table.setColumnCount(19)  # Define 19 colunas
+        self.table.setHorizontalHeaderLabels(
+            ['CD_PESSOA', 'NU_CGC_CPF', 'CD_PROCEDIMENTO', 'PROCEDIMENTO_TUSS',
+            'CD_TIPO_REDE_ATENDIMENTO', 'FL_DISPONIVEL_LIVRO', 'FL_DISPONIVEL_WEB',
+            'DT_INICIO_VIGENCIA', 'DT_FIM_VIGENCIA', 'FL_CONSULTA', 'FL_EXAME',
+            'FL_TRATAMENTO', 'FL_PQA', 'FL_INTERNACAO', 'FL_SERVICO',
+            'VL_ORDEM_PRIORIDADE', 'FL_PE', 'CD_EMPRESA_PLANO', 'TIPO_TELA']
+        )
         main_layout.addWidget(self.table)
 
         # Separador
