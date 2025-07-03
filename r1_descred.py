@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QWidget
 class R1Descred(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("R1 Descred")
+        self.setWindowTitle("DESCRED")
         self.setGeometry(100, 100, 500, 600)
         self.setWindowIcon(QIcon(r'./Arquivos/logo/logo.ico'))
         self.r1_descred = QTabWidget()
@@ -30,7 +30,7 @@ class R1Descred(QMainWindow):
     def createview(self):
         space = 5 * ' '
         self.setCentralWidget(self.r1_descred)
-        self.r1_descred.addTab(self.provider_descred, f'{space} Descredenciamento {space}')
+        self.r1_descred.addTab(self.provider_descred, f'{space} R1 {space}')
         # self.r1_descred.addTab(self.center_clinic, f'{space} Centro Clínico {space}')
         self.r1_descred.setDocumentMode(True)
         self.r1_descred.setMovable(True)

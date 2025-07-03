@@ -16,82 +16,199 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QTextEdit
+from PyQt5.QtWidgets import QCheckBox
+from PyQt5.QtWidgets import QGroupBox
 import os
 #from SearchWindow import SearchWindow
 #from ARQUIVOS.Oracle_Jdbc.jdbc_teste_02 import JdbcPermission 
+from Arquivos.Oracle_jdbc.script_jdbc_descred import JdbcPermission_descred
 
 class DescredWindow:
     def __init__(self, parent=None):
         self.parent = parent
         self.file_path = None
         self.output_path = None
-        self.df = pd.DataFrame()
-        self.progress_bar_process = None
+        self.df_descredenciado = pd.DataFrame()
+        self.df_substituto = pd.DataFrame()
+        self.progress_bar_process_descredenciado = None
+        self.progress_bar_process_substituto = None
         self.df_search = pd.DataFrame()  # DataFrame para armazenar os dados pesquisados
+        self.df_search_descredenciado = pd.DataFrame()  # DataFrame para Descredenciado
+        self.df_search_substituto = pd.DataFrame()  # DataFrame para Substituto
+        
+        # Checkboxes para Descredenciado
+        self.checkbox_desc_1 = None
+        self.checkbox_desc_2 = None
+        self.checkbox_desc_3 = None
+        self.checkbox_desc_4 = None
+        self.checkbox_desc_5 = None
+        
+        # Checkboxes para Substituto
+        self.checkbox_sub_1 = None
+        self.checkbox_sub_2 = None
+        self.checkbox_sub_3 = None
+        self.checkbox_sub_4 = None
+        self.checkbox_sub_5 = None
+        
+        # Campos de pesquisa
+        self.search_input_descredenciado = None
+        self.search_input_substituto = None
+        
+        # Tabelas
+        self.table_descredenciado = None
+        self.table_substituto = None
 
-    def create_descred_window(self, service_process):
-        service = QVBoxLayout()
-
-        # Layout horizontal para o QLabel e o botão "Limpar Status"
-        status_layout = QHBoxLayout()
-
-        # QLabel para exibir o status do arquivo
-        self.label_status_win_one = QLabel("Nenhum arquivo carregado.")
-        status_layout.addWidget(self.label_status_win_one)
-
-        # Adiciona um espaço expansível para empurrar o botão para a direita
-        status_layout.addStretch()
-
-        # Botão para limpar o status
-        btn_clear_status = QPushButton("Limpar Status")
-        btn_clear_status.setFixedSize(150, 35)
-        btn_clear_status.clicked.connect(self.clear_status)
-        status_layout.addWidget(btn_clear_status)
-
-        # Adiciona o layout horizontal ao layout vertical principal
-        service.addLayout(status_layout)
-
-        # Barra de progresso (agora como atributo da classe)
-        self.progress_bar_process = QProgressBar()
-        self.progress_bar_process.setValue(0)
-        self.progress_bar_process.setMinimum(0)
-        self.progress_bar_process.setMaximum(100)
-        service.addWidget(self.progress_bar_process)
-
-        # QTextEdit para exibir informações do arquivo carregado
-        self.text_edit_info = QTextEdit()
-        self.text_edit_info.setReadOnly(True)
-        service.addWidget(self.text_edit_info)
-
-        # Separador horizontal
+    def create_descred_window(self, descred_process):
+        # Layout principal
+        main_layout = QVBoxLayout()
+        
+        # ========== SEÇÃO DESCREDENCIADO ==========
+        # Grupo para Descredenciado
+        group_descredenciado = QGroupBox("DESCREDENCIADO")
+        layout_descredenciado = QVBoxLayout()
+        
+        # Status layout para Descredenciado
+        status_layout_desc = QHBoxLayout()
+        self.label_status_descredenciado = QLabel("Nenhum arquivo carregado - Descredenciado.")
+        status_layout_desc.addWidget(self.label_status_descredenciado)
+        status_layout_desc.addStretch()
+        
+        btn_clear_status_desc = QPushButton("Limpar Status")
+        btn_clear_status_desc.setFixedSize(100, 35)
+        btn_clear_status_desc.clicked.connect(self.clear_status_descredenciado)
+        status_layout_desc.addWidget(btn_clear_status_desc)
+        layout_descredenciado.addLayout(status_layout_desc)
+        
+        # Barra de progresso para Descredenciado
+        self.progress_bar_process_descredenciado = QProgressBar()
+        self.progress_bar_process_descredenciado.setValue(0)
+        self.progress_bar_process_descredenciado.setMinimum(0)
+        self.progress_bar_process_descredenciado.setMaximum(100)
+        layout_descredenciado.addWidget(self.progress_bar_process_descredenciado)
+        
+        # 5 Checkboxes para Descredenciado
+        checkboxes_layout_desc = QHBoxLayout()
+        self.checkbox_desc_1 = QCheckBox("HAPVIDA")
+        self.checkbox_desc_2 = QCheckBox("CCG")
+        self.checkbox_desc_3 = QCheckBox("CLINIPAM")
+        self.checkbox_desc_4 = QCheckBox("NDI MINAS")
+        self.checkbox_desc_5 = QCheckBox("NDI SAÚDE")
+        
+        checkboxes_layout_desc.addWidget(self.checkbox_desc_1)
+        checkboxes_layout_desc.addWidget(self.checkbox_desc_2)
+        checkboxes_layout_desc.addWidget(self.checkbox_desc_3)
+        checkboxes_layout_desc.addWidget(self.checkbox_desc_4)
+        checkboxes_layout_desc.addWidget(self.checkbox_desc_5)
+        layout_descredenciado.addLayout(checkboxes_layout_desc)
+        
+        # Campo de pesquisa e botão para Descredenciado
+        search_layout_desc = QHBoxLayout()
+        self.search_input_descredenciado = QLineEdit()
+        self.search_input_descredenciado.setPlaceholderText("Digite os protocolos para Descredenciado...")
+        search_layout_desc.addWidget(self.search_input_descredenciado)
+        
+        btn_search_desc = QPushButton("Buscar")
+        btn_search_desc.setFixedSize(100, 30)
+        btn_search_desc.clicked.connect(self.search_descredenciado)
+        search_layout_desc.addWidget(btn_search_desc)
+        layout_descredenciado.addLayout(search_layout_desc)
+        
+        # Tabela para Descredenciado
+        self.table_descredenciado = QTableWidget()
+        self.table_descredenciado.setMaximumHeight(150)  # Mostra aproximadamente 5 linhas
+        layout_descredenciado.addWidget(self.table_descredenciado)
+        
+        group_descredenciado.setLayout(layout_descredenciado)
+        main_layout.addWidget(group_descredenciado)
+        
+        # ========== SEPARADOR ==========
         separator = QFrame()
         separator.setFrameShape(QFrame.HLine)
         separator.setFrameShadow(QFrame.Sunken)
-        service.addWidget(separator)
-
-        # Layout horizontal para os botões
+        main_layout.addWidget(separator)
+        
+        # ========== SEÇÃO SUBSTITUTO ==========
+        # Grupo para Substituto
+        group_substituto = QGroupBox("SUBSTITUTO")
+        layout_substituto = QVBoxLayout()
+        
+        # Status layout para Substituto
+        status_layout_sub = QHBoxLayout()
+        self.label_status_substituto = QLabel("Nenhum arquivo carregado - Substituto.")
+        status_layout_sub.addWidget(self.label_status_substituto)
+        status_layout_sub.addStretch()
+        
+        btn_clear_status_sub = QPushButton("Limpar Status")
+        btn_clear_status_sub.setFixedSize(100, 35)
+        btn_clear_status_sub.clicked.connect(self.clear_status_substituto)
+        status_layout_sub.addWidget(btn_clear_status_sub)
+        layout_substituto.addLayout(status_layout_sub)
+        
+        # Barra de progresso para Substituto
+        self.progress_bar_process_substituto = QProgressBar()
+        self.progress_bar_process_substituto.setValue(0)
+        self.progress_bar_process_substituto.setMinimum(0)
+        self.progress_bar_process_substituto.setMaximum(100)
+        layout_substituto.addWidget(self.progress_bar_process_substituto)
+        
+        # 5 Checkboxes para Substituto
+        checkboxes_layout_sub = QHBoxLayout()
+        self.checkbox_sub_1 = QCheckBox("HAPVIDA")
+        self.checkbox_sub_2 = QCheckBox("CCG")
+        self.checkbox_sub_3 = QCheckBox("CLINIPAM")
+        self.checkbox_sub_4 = QCheckBox("NDI MINAS")
+        self.checkbox_sub_5 = QCheckBox("NDI SAÚDE")
+        
+        checkboxes_layout_sub.addWidget(self.checkbox_sub_1)
+        checkboxes_layout_sub.addWidget(self.checkbox_sub_2)
+        checkboxes_layout_sub.addWidget(self.checkbox_sub_3)
+        checkboxes_layout_sub.addWidget(self.checkbox_sub_4)
+        checkboxes_layout_sub.addWidget(self.checkbox_sub_5)
+        layout_substituto.addLayout(checkboxes_layout_sub)
+        
+        # Campo de pesquisa e botão para Substituto
+        search_layout_sub = QHBoxLayout()
+        self.search_input_substituto = QLineEdit()
+        self.search_input_substituto.setPlaceholderText("Digite os protocolos para Substituto...")
+        search_layout_sub.addWidget(self.search_input_substituto)
+        
+        btn_search_sub = QPushButton("Buscar")
+        btn_search_sub.setFixedSize(100, 30)
+        btn_search_sub.clicked.connect(self.search_substituto)
+        search_layout_sub.addWidget(btn_search_sub)
+        layout_substituto.addLayout(search_layout_sub)
+        
+        # Tabela para Substituto
+        self.table_substituto = QTableWidget()
+        self.table_substituto.setMaximumHeight(150)  # Mostra aproximadamente 5 linhas
+        layout_substituto.addWidget(self.table_substituto)
+        
+        group_substituto.setLayout(layout_substituto)
+        main_layout.addWidget(group_substituto)
+        
+        # ========== BOTÕES FINAIS ==========
+        # Layout horizontal para os botões finais
         button_layout = QHBoxLayout()
-
-        # Botão para selecionar o arquivo principal
-        btn_search = QPushButton("Pesquisar")
-        btn_search.setFixedSize(150, 35)
-        btn_search.clicked.connect(self.searchwindow)
-        button_layout.addWidget(btn_search)
-
+        
+        # Botão para processar dados
+        btn_process = QPushButton("Processar")
+        btn_process.setFixedSize(150, 35)
+        btn_process.clicked.connect(self.process_data)
+        button_layout.addWidget(btn_process)
+        
         # Adiciona um espaço expansível entre os botões
         button_layout.addStretch()
-
-        # Botão para processar e salvar o arquivo
-        btn_process_save = QPushButton("Salvar")
-        btn_process_save.setFixedSize(150, 35)
-        btn_process_save.clicked.connect(self.process_and_save)
-        button_layout.addWidget(btn_process_save)
-
-        # Adiciona o layout horizontal ao layout vertical principal
-        service.addLayout(button_layout)
-
+        
+        # Botão para salvar
+        btn_save = QPushButton("Salvar")
+        btn_save.setFixedSize(150, 35)
+        btn_save.clicked.connect(self.process_and_save)
+        button_layout.addWidget(btn_save)
+        
+        main_layout.addLayout(button_layout)
+        
         # Configurando o layout na aba
-        service_process.setLayout(service)
+        descred_process.setLayout(main_layout)
     
     # Função para pesquisar no banco por protocolo
     def searchwindow(self):
@@ -139,73 +256,37 @@ class DescredWindow:
     
     # Função para limpar o status
     def clear_status(self):
-        self.progress_bar_process.setValue(0)
-        self.label_status_win_one.setText("Nenhum arquivo carregado.")
+        # self.progress_bar_process.setValue(0)
+        # self.label_status_win_one.setText("Nenhum arquivo carregado.")
+        ...
+    
+    # Funções para limpar status específicos
+    def clear_status_descredenciado(self):
+        # Você implementará esta função
+        pass
+        
+    def clear_status_substituto(self):
+        # Você implementará esta função
+        pass
+    
+    # Funções de pesquisa
+    def search_descredenciado(self):
+        # Você implementará esta função
+        self.searchwindow()
+    
+    def search_substituto(self):
+        # Você implementará esta função
+        pass
+    
+    # Função para processar dados
+    def process_data(self):
+        # Você implementará esta função
+        pass
     
     
     
     def save_to_excel(self, df, file_path):
-
-        try:
-            ...
-            # df_tabelas = pd.read_csv(r'./ARQUIVOS/de_para_sigo.csv', sep=';', encoding='latin1', low_memory=False)
-            # print(f'Quantidade de linhas e colunas df_tabelas: {df_tabelas.shape}')
-
-            # df_tabelas['ANO_TABELA'] = df_tabelas['ANO_TABELA'].astype(str)
-            # df_tabelas.rename(columns={'ANO_TABELA': 'TABELA', 'DESCRICAO':'DESCRIÇÃO TABELA'}, inplace=True)
-
-            # df_copy = df.copy()  # Cria uma cópia do DataFrame para evitar problemas de escrita 
-            sheet_name = f'GERAL {df_copy.CD_PROTOCOLO.iloc[0]}'
-            # df_copy = self.rename_columns()  # Renomeia as colunas
-
-            # map_dict = dict(zip(df_tabelas['TABELA'], df_tabelas['DESCRIÇÃO TABELA']))
-            # df_copy['DESCRIÇÃO TABELA'] = df_copy['TABELA'].map(map_dict).fillna('-')
-            
-            # order_columns = ['PROTOCOLO', 'TABELA', 'DESCRIÇÃO TABELA', 'CÓDIGO NEGOCIAÇÃO', 'CÓDIGO TUSS',
-            #     'DESCRIÇÃO', 'DESCRIÇÃO TUSS', 'CH', 'PORTE', 'UCO', 'FILME', 'LOCAL',
-            #     'URGÊNCIA', 'ELETIVO', 'QTD_REDE', 'REDE']
-            
-            # df_copy = df_copy[order_columns].copy()  # Reordena as colunas
-            print(f'df_copy: {df_copy.columns}')
-
-            df_copy.to_excel(file_path, index=False, engine='openpyxl', sheet_name=sheet_name)
-            self.label_status_win_one.setText(f"{df.shape[0]} linhas carregadas e salvas no arquivo Excel.")
-            
-            #print(f'Teste 1')
-            # df_copy['CÓDIGO TUSS'] = df_copy['CÓDIGO TUSS'].astype(str).replace('0', '-')
-            # df_copy['DESCRIÇÃO TUSS'] = df_copy['DESCRIÇÃO TUSS'].astype(str).replace('0', '-')
-            # df_copy['LOCAL'] = df_copy['LOCAL'].fillna('-')
-            # df_copy['DESCRIÇÃO TUSS'] = df_copy['DESCRIÇÃO TUSS'].astype(str).replace('0', '-')
-            # df_copy['LOCAL'] = df_copy['LOCAL'].fillna('-')
-            # df_copy['DESCRIÇÃO TUSS'] = df_copy['DESCRIÇÃO TUSS'].astype(str).replace('.0', '')
-            # #print(f'Teste 2')
-            # # criando a chave para separar os arquivos para salvar
-            # df_copy['KEY_BREAK'] = df_copy['CH'].astype(str) + '_' + df_copy['PORTE'].astype(str) + '_' + df_copy['UCO'].astype(str) + '_' + df_copy['FILME'].astype(str) + '_' + df_copy['LOCAL'].astype(str) + '_' + df_copy['URGÊNCIA'].astype(str) + '_' + df_copy['ELETIVO'].astype(str)
-            # #print(f'Teste 3')
-            # print(df_copy.columns)
-            order_columns_02 = ['PROTOCOLO', 'TABELA', 'DESCRIÇÃO TABELA', 'CÓDIGO NEGOCIAÇÃO', 'CÓDIGO TUSS',
-                'DESCRIÇÃO', 'DESCRIÇÃO TUSS', 'CH', 'PORTE', 'UCO', 'FILME', 'LOCAL',
-                'URGÊNCIA', 'ELETIVO', 'QTD_REDE', 'REDE', 'KEY_BREAK']
-            
-            df_copy = df_copy[order_columns_02].copy()  # Reordena as colunas novamente
-            # salvando no mesmo arquivo Excel, mas em abas diferentes por valor unique da chave
-            unique_keys = df_copy['KEY_BREAK'].unique()
-            neg = f'NEG. '
-            with pd.ExcelWriter(file_path, engine='openpyxl', mode='a') as writer:
-                for num, key in enumerate(unique_keys):
-                    df_key = df_copy[df_copy['KEY_BREAK'] == key].copy()
-                    df_key.drop(columns=['KEY_BREAK'], inplace=True)  # Remove a coluna de chave
-                    df_key.reset_index(drop=True, inplace=True)  # Reseta o índice
-                    name_sheet_aba = f'{neg}{num + 1}'
-                    df_key.to_excel(writer, index=False, sheet_name=name_sheet_aba)
-
-            self.file_path = file_path  # Armazena o caminho do arquivo
-            self.output_path = os.path.dirname(file_path)  # Armazena o diretório do arquivo
-
-            #self.text_edit_info.setText(f"Arquivo salvo com sucesso em:\n{file_path}\n\nTotal de linhas: {df.shape[0]}")
-            QMessageBox.information(self.parent, "Sucesso", f"Arquivo salvo em:\n{file_path}")
-        except Exception as e:
-            QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao salvar o arquivo:\n{str(e)}")
+        ...
 
 
 
@@ -303,11 +384,13 @@ class SearchWindow(QDialog):
         if search_term:
             try:
                 # Instancia a classe JdbcPermission
-                #jdbc_permission = JdbcPermission(path_drive)
-                jdbc_permission = None
+                jdbc_permission = JdbcPermission_descred(path_drive)
+                #jdbc_permission = None
 
                 # Usa o método fetch_data para buscar os dados
-                self.df_search, protocol = jdbc_permission.fetch_data(search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search)
+                #self.df_search, protocol = jdbc_permission.fetch_data(protocol=search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search)
+                self.df_search = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term)
+                protocol = search_term
 
                 self.label_status.setText(f"{len(self.df_search)} linhas carregadas.")
                 # Atualiza o self.df_search com os dados encontrados
