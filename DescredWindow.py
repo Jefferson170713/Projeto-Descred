@@ -289,23 +289,26 @@ class DescredWindow:
             try:
                 list_empresa = []
                 if self.checkbox_desc_1.isChecked():
-                    list_empresa.append('HAPVIDA')
+                    list_empresa.append('1')
                 if self.checkbox_desc_2.isChecked():
-                    list_empresa.append('CCG')
+                    list_empresa.append('8')
                 if self.checkbox_desc_3.isChecked():
-                    list_empresa.append('CLINIPAM')
+                    list_empresa.append('9')
                 if self.checkbox_desc_4.isChecked():
-                    list_empresa.append('NDI MINAS')
+                    list_empresa.append('10')
                 if self.checkbox_desc_5.isChecked():
-                    list_empresa.append('NDI SAÚDE')
-                # Verifica se pelo menos uma checkbox está marcada
+                    list_empresa.append('10')
+                else:
+                    list_empresa = ', '.join(map(str, list_empresa))
+                
                 if not list_empresa:
                     QMessageBox.warning(self.parent, "AVISO - DESCREDENCIADO", "Por favor, selecione pelo menos uma empresa.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
                     return
+                    
                 # Instancia a classe JdbcPermission
                 jdbc_permission = JdbcPermission_descred(path_drive)
                 # Usa o método fetch_data para buscar os dados
-                self.df_search_descredenciado = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term, progress_bar=self.progress_bar_process_descredenciado)
+                self.df_search_descredenciado = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term, progress_bar=self.progress_bar_process_descredenciado, list_empresa=list_empresa)
                 number_of_lines = self.format_int(len(self.df_search_descredenciado))
                 self.label_status_descredenciado.setText(f"{number_of_lines} linhas carregadas - Descredenciado.")
                 
