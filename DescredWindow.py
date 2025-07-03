@@ -19,6 +19,9 @@ from PyQt5.QtWidgets import QTextEdit
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QGroupBox
 import os
+import locale
+# Configura a localidade para o formato brasileiro
+locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 #from SearchWindow import SearchWindow
 #from ARQUIVOS.Oracle_Jdbc.jdbc_teste_02 import JdbcPermission 
 from Arquivos.Oracle_jdbc.script_jdbc_descred import JdbcPermission_descred
@@ -115,6 +118,15 @@ class DescredWindow:
         
         # Tabela para Descredenciado
         self.table_descredenciado = QTableWidget()
+        # self.table_descredenciado.setColumnCount(19)  # Define 19 colunas
+        # self.table_descredenciado.setHorizontalHeaderLabels(
+        #     ['CD_PESSOA', 'NU_CGC_CPF', 'CD_PROCEDIMENTO', 'PROCEDIMENTO_TUSS',
+        #      'CD_TIPO_REDE_ATENDIMENTO', 'FL_DISPONIVEL_LIVRO', 'FL_DISPONIVEL_WEB',
+        #      'DT_INICIO_VIGENCIA', 'DT_FIM_VIGENCIA', 'FL_CONSULTA', 'FL_EXAME',
+        #      'FL_TRATAMENTO', 'FL_PQA', 'FL_INTERNACAO', 'FL_SERVICO',
+        #      'VL_ORDEM_PRIORIDADE', 'FL_PE', 'CD_EMPRESA_PLANO', 'TIPO_TELA']
+        # )
+        
         self.table_descredenciado.setMaximumHeight(150)  # Mostra aproximadamente 5 linhas
         layout_descredenciado.addWidget(self.table_descredenciado)
         
@@ -180,6 +192,14 @@ class DescredWindow:
         
         # Tabela para Substituto
         self.table_substituto = QTableWidget()
+        # self.table_substituto.setColumnCount(19)  # Define 19 colunas
+        # self.table_substituto.setHorizontalHeaderLabels(
+        #     ['CD_PESSOA', 'NU_CGC_CPF', 'CD_PROCEDIMENTO', 'PROCEDIMENTO_TUSS',
+        #      'CD_TIPO_REDE_ATENDIMENTO', 'FL_DISPONIVEL_LIVRO', 'FL_DISPONIVEL_WEB',
+        #      'DT_INICIO_VIGENCIA', 'DT_FIM_VIGENCIA', 'FL_CONSULTA', 'FL_EXAME',
+        #      'FL_TRATAMENTO', 'FL_PQA', 'FL_INTERNACAO', 'FL_SERVICO',
+        #      'VL_ORDEM_PRIORIDADE', 'FL_PE', 'CD_EMPRESA_PLANO', 'TIPO_TELA']
+        # )
         self.table_substituto.setMaximumHeight(150)  # Mostra aproximadamente 5 linhas
         layout_substituto.addWidget(self.table_substituto)
         
@@ -211,11 +231,17 @@ class DescredWindow:
         descred_process.setLayout(main_layout)
     
     # Função para pesquisar no banco por protocolo
-    def searchwindow(self):
+    def searchwindow(self, value=None):
         # Cria uma instância da janela de pesquisa
         search_window = SearchWindow(self.parent)
         search_window.exec_()  # Exibe a janela de forma modal
         self.df_search = search_window.df_search
+        if value == 1:
+            # Se value for 1, atualiza o DataFrame de pesquisa para Descredenciado
+            self.df_search_descredenciado = search_window.df_search
+        else:
+            # Se value for outro valor, atualiza o DataFrame de pesquisa para Substituto
+            self.df_search_substituto = search_window.df_search
     
     # Função para processar e salvar o arquivo
     def process_and_save(self):
@@ -272,11 +298,37 @@ class DescredWindow:
     # Funções de pesquisa
     def search_descredenciado(self):
         # Você implementará esta função
-        self.searchwindow()
+        #self.searchwindow(1)
+        search_term = self.search_input_descredenciado.text()
+        path_drive = r'./ARQUIVOS/Oracle_Jdbc/ojdbc8.jar'
+        
+        if search_term:
+            try:
+                # Instancia a classe JdbcPermission
+                jdbc_permission = JdbcPermission_descred(path_drive)
+                # Usa o método fetch_data para buscar os dados
+                self.df_search_descredenciado = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term)
+                number_of_lines = self.format_int(len(self.df_search_descredenciado))
+                self.label_status_descredenciado.setText(f"{number_of_lines} linhas carregadas - Descredenciado.")
+                
+                # Atualiza a tabela com os dados encontrados
+                self.table_descredenciado.setRowCount(len(self.df_search_descredenciado))
+                self.table_descredenciado.setColumnCount(len(self.df_search_descredenciado.columns))
+                self.table_descredenciado.setHorizontalHeaderLabels(self.df_search_descredenciado.columns)
+
+                for row_idx, row_data in self.df_search_descredenciado.iterrows():
+                    for col_idx, value in enumerate(row_data):
+                        item = QTableWidgetItem(str(value))
+                        self.table_descredenciado.setItem(row_idx, col_idx, item)
+
+            except Exception as error:
+                QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
+        else:
+            QMessageBox.warning(self.parent, "Aviso", "Por favor, insira um termo de pesquisa válido.")
     
     def search_substituto(self):
         # Você implementará esta função
-        pass
+        self.searchwindow(2)
     
     # Função para processar dados
     def process_data(self):
@@ -287,6 +339,9 @@ class DescredWindow:
     
     def save_to_excel(self, df, file_path):
         ...
+        
+    def format_int(self, value):
+        return locale.format_string('%.f', value, grouping=True)
 
 
 
