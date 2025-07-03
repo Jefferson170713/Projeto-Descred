@@ -118,15 +118,6 @@ class DescredWindow:
         
         # Tabela para Descredenciado
         self.table_descredenciado = QTableWidget()
-        # self.table_descredenciado.setColumnCount(19)  # Define 19 colunas
-        # self.table_descredenciado.setHorizontalHeaderLabels(
-        #     ['CD_PESSOA', 'NU_CGC_CPF', 'CD_PROCEDIMENTO', 'PROCEDIMENTO_TUSS',
-        #      'CD_TIPO_REDE_ATENDIMENTO', 'FL_DISPONIVEL_LIVRO', 'FL_DISPONIVEL_WEB',
-        #      'DT_INICIO_VIGENCIA', 'DT_FIM_VIGENCIA', 'FL_CONSULTA', 'FL_EXAME',
-        #      'FL_TRATAMENTO', 'FL_PQA', 'FL_INTERNACAO', 'FL_SERVICO',
-        #      'VL_ORDEM_PRIORIDADE', 'FL_PE', 'CD_EMPRESA_PLANO', 'TIPO_TELA']
-        # )
-        
         self.table_descredenciado.setMaximumHeight(150)  # Mostra aproximadamente 5 linhas
         layout_descredenciado.addWidget(self.table_descredenciado)
         
@@ -192,14 +183,6 @@ class DescredWindow:
         
         # Tabela para Substituto
         self.table_substituto = QTableWidget()
-        # self.table_substituto.setColumnCount(19)  # Define 19 colunas
-        # self.table_substituto.setHorizontalHeaderLabels(
-        #     ['CD_PESSOA', 'NU_CGC_CPF', 'CD_PROCEDIMENTO', 'PROCEDIMENTO_TUSS',
-        #      'CD_TIPO_REDE_ATENDIMENTO', 'FL_DISPONIVEL_LIVRO', 'FL_DISPONIVEL_WEB',
-        #      'DT_INICIO_VIGENCIA', 'DT_FIM_VIGENCIA', 'FL_CONSULTA', 'FL_EXAME',
-        #      'FL_TRATAMENTO', 'FL_PQA', 'FL_INTERNACAO', 'FL_SERVICO',
-        #      'VL_ORDEM_PRIORIDADE', 'FL_PE', 'CD_EMPRESA_PLANO', 'TIPO_TELA']
-        # )
         self.table_substituto.setMaximumHeight(150)  # Mostra aproximadamente 5 linhas
         layout_substituto.addWidget(self.table_substituto)
         
@@ -304,10 +287,25 @@ class DescredWindow:
         
         if search_term:
             try:
+                list_empresa = []
+                if self.checkbox_desc_1.isChecked():
+                    list_empresa.append('HAPVIDA')
+                if self.checkbox_desc_2.isChecked():
+                    list_empresa.append('CCG')
+                if self.checkbox_desc_3.isChecked():
+                    list_empresa.append('CLINIPAM')
+                if self.checkbox_desc_4.isChecked():
+                    list_empresa.append('NDI MINAS')
+                if self.checkbox_desc_5.isChecked():
+                    list_empresa.append('NDI SAÚDE')
+                # Verifica se pelo menos uma checkbox está marcada
+                if not list_empresa:
+                    QMessageBox.warning(self.parent, "AVISO - DESCREDENCIADO", "Por favor, selecione pelo menos uma empresa.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
+                    return
                 # Instancia a classe JdbcPermission
                 jdbc_permission = JdbcPermission_descred(path_drive)
                 # Usa o método fetch_data para buscar os dados
-                self.df_search_descredenciado = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term)
+                self.df_search_descredenciado = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term, progress_bar=self.progress_bar_process_descredenciado)
                 number_of_lines = self.format_int(len(self.df_search_descredenciado))
                 self.label_status_descredenciado.setText(f"{number_of_lines} linhas carregadas - Descredenciado.")
                 
