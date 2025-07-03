@@ -77,7 +77,7 @@ class DescredWindow:
         status_layout_desc.addStretch()
         
         btn_clear_status_desc = QPushButton("Limpar Status")
-        btn_clear_status_desc.setFixedSize(100, 35)
+        btn_clear_status_desc.setFixedSize(100, 30)
         btn_clear_status_desc.clicked.connect(self.clear_status_descredenciado)
         status_layout_desc.addWidget(btn_clear_status_desc)
         layout_descredenciado.addLayout(status_layout_desc)
@@ -142,7 +142,7 @@ class DescredWindow:
         status_layout_sub.addStretch()
         
         btn_clear_status_sub = QPushButton("Limpar Status")
-        btn_clear_status_sub.setFixedSize(100, 35)
+        btn_clear_status_sub.setFixedSize(100, 30)
         btn_clear_status_sub.clicked.connect(self.clear_status_substituto)
         status_layout_sub.addWidget(btn_clear_status_sub)
         layout_substituto.addLayout(status_layout_sub)
@@ -213,18 +213,6 @@ class DescredWindow:
         # Configurando o layout na aba
         descred_process.setLayout(main_layout)
     
-    # Função para pesquisar no banco por protocolo
-    def searchwindow(self, value=None):
-        # Cria uma instância da janela de pesquisa
-        search_window = SearchWindow(self.parent)
-        search_window.exec_()  # Exibe a janela de forma modal
-        self.df_search = search_window.df_search
-        if value == 1:
-            # Se value for 1, atualiza o DataFrame de pesquisa para Descredenciado
-            self.df_search_descredenciado = search_window.df_search
-        else:
-            # Se value for outro valor, atualiza o DataFrame de pesquisa para Substituto
-            self.df_search_substituto = search_window.df_search
     
     # Função para processar e salvar o arquivo
     def process_and_save(self):
@@ -263,25 +251,25 @@ class DescredWindow:
         except Exception as erro:
             QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao salvar o arquivo:\n{str(erro)}")
     
-    # Função para limpar o status
-    def clear_status(self):
-        # self.progress_bar_process.setValue(0)
-        # self.label_status_win_one.setText("Nenhum arquivo carregado.")
-        ...
-    
+
     # Funções para limpar status específicos
     def clear_status_descredenciado(self):
-        # Você implementará esta função
-        pass
+        # função para limpar o status de Descredenciado
+        self.progress_bar_process_descredenciado.setValue(0)
+        self.label_status_descredenciado.setText("Nenhum arquivo carregado - Descredenciado.")
+        # limpando a tabela e deixando completamente em branco novamente
+        self.table_descredenciado.setRowCount(0)
         
+    # Função para limpar o status de Substituto  
     def clear_status_substituto(self):
-        # Você implementará esta função
-        pass
+        # função para limpar o status de Substituto
+        self.progress_bar_process_substituto.setValue(0)
+        self.label_status_substituto.setText("Nenhum arquivo carregado - Substituto.")
+        # limpando a tabela e deixando completamente em branco novamente
+        self.table_substituto.setRowCount(0)
     
     # Funções de pesquisa
     def search_descredenciado(self):
-        # Você implementará esta função
-        #self.searchwindow(1)
         search_term = self.search_input_descredenciado.text()
         path_drive = r'./ARQUIVOS/Oracle_Jdbc/ojdbc8.jar'
         
@@ -328,14 +316,55 @@ class DescredWindow:
             QMessageBox.warning(self.parent, "Aviso", "Por favor, insira um termo de pesquisa válido.")
     
     def search_substituto(self):
-        # Você implementará esta função
-        self.searchwindow(2)
+        search_term = self.search_input_substituto.text()
+        path_drive = r'./ARQUIVOS/Oracle_Jdbc/ojdbc8.jar'
+        
+        if search_term:
+            try:
+                list_empresa = []
+                if self.checkbox_sub_1.isChecked():
+                    list_empresa.append('1')
+                if self.checkbox_sub_2.isChecked():
+                    list_empresa.append('8')
+                if self.checkbox_sub_3.isChecked():
+                    list_empresa.append('9')
+                if self.checkbox_sub_4.isChecked():
+                    list_empresa.append('10')
+                if self.checkbox_sub_5.isChecked():
+                    list_empresa.append('10')
+                else:
+                    list_empresa = ', '.join(map(str, list_empresa))
+                
+                if not list_empresa:
+                    QMessageBox.warning(self.parent, "AVISO - SUBSTITUTO", "Por favor, selecione pelo menos uma empresa.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
+                    return
+                    
+                # Instancia a classe JdbcPermission
+                jdbc_permission = JdbcPermission_descred(path_drive)
+                # Usa o método fetch_data para buscar os dados
+                self.df_search_substituto = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term, progress_bar=self.progress_bar_process_substituto, list_empresa=list_empresa)
+                number_of_lines = self.format_int(len(self.df_search_substituto))
+                self.label_status_substituto.setText(f"{number_of_lines} linhas carregadas - Substituto.")
+                
+                # Atualiza a tabela com os dados encontrados
+                self.table_substituto.setRowCount(len(self.df_search_substituto))
+                self.table_substituto.setColumnCount(len(self.df_search_substituto.columns))
+                self.table_substituto.setHorizontalHeaderLabels(self.df_search_substituto.columns)
+
+                for row_idx, row_data in self.df_search_substituto.iterrows():
+                    for col_idx, value in enumerate(row_data):
+                        item = QTableWidgetItem(str(value))
+                        self.table_substituto.setItem(row_idx, col_idx, item)
+
+            except Exception as error:
+                QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
+        else:
+            QMessageBox.warning(self.parent, "Aviso", "Por favor, insira um termo de pesquisa válido.")
     
     # Função para processar dados
     def process_data(self):
         # Você implementará esta função
         pass
-    
     
     
     def save_to_excel(self, df, file_path):
@@ -344,138 +373,3 @@ class DescredWindow:
     def format_int(self, value):
         return locale.format_string('%.f', value, grouping=True)
 
-
-
-class SearchWindow(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Pesquisar Dados")
-        self.setFixedSize(600, 400)  # Tamanho fixo da janela
-        self.init_ui()
-        self.df_search = pd.DataFrame()  # DataFrame para armazenar os dados pesquisados
-        self.parent = parent  # Armazena a referência ao widget pai
-        #elf.progress_bar_process_search = None
-
-    def init_ui(self):
-        # Cria o layout principal
-        main_layout = QVBoxLayout()
-
-        # Linha para entrada de texto e botão de pesquisa
-        search_layout = QHBoxLayout()
-        self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("Digite os Protocolos...")
-        search_layout.addWidget(self.search_input)
-
-        btn_search = QPushButton("Pesquisar")
-        btn_search.setFixedSize(100, 30)
-        btn_search.clicked.connect(self.perform_search)  # Conecta à função de pesquisa
-        search_layout.addWidget(btn_search)
-
-        # Barra de progresso (agora como atributo da classe)
-        self.progress_bar_process_search = QProgressBar()
-        self.progress_bar_process_search.setValue(0)
-        self.progress_bar_process_search.setMinimum(0)
-        self.progress_bar_process_search.setMaximum(100)
-        main_layout.addWidget(self.progress_bar_process_search)
-
-        self.label_status = QLabel("Status: Nenhuma pesquisa realizada.")
-        main_layout.addWidget(self.label_status)
-
-
-        main_layout.addLayout(search_layout)
-
-        # Separador
-        separator1 = QFrame()
-        separator1.setFrameShape(QFrame.HLine)
-        separator1.setFrameShadow(QFrame.Sunken)
-        main_layout.addWidget(separator1)
-
-        # Tabela para exibir os resultados
-        self.table = QTableWidget()
-        self.table.setColumnCount(19)  # Define 19 colunas
-        self.table.setHorizontalHeaderLabels(
-            ['CD_PESSOA', 'NU_CGC_CPF', 'CD_PROCEDIMENTO', 'PROCEDIMENTO_TUSS',
-            'CD_TIPO_REDE_ATENDIMENTO', 'FL_DISPONIVEL_LIVRO', 'FL_DISPONIVEL_WEB',
-            'DT_INICIO_VIGENCIA', 'DT_FIM_VIGENCIA', 'FL_CONSULTA', 'FL_EXAME',
-            'FL_TRATAMENTO', 'FL_PQA', 'FL_INTERNACAO', 'FL_SERVICO',
-            'VL_ORDEM_PRIORIDADE', 'FL_PE', 'CD_EMPRESA_PLANO', 'TIPO_TELA']
-        )
-        main_layout.addWidget(self.table)
-
-        # Separador
-        separator2 = QFrame()
-        separator2.setFrameShape(QFrame.HLine)
-        separator2.setFrameShadow(QFrame.Sunken)
-        main_layout.addWidget(separator2)
-
-        # Botão para armazenar a informação (centralizado)
-        btn_store_layout = QHBoxLayout()
-        btn_store = QPushButton("Armazenar Informação")
-        btn_store.setFixedSize(200, 40)
-        btn_store.clicked.connect(self.store_information)  # Conecta à função de armazenamento
-        btn_store_layout.addStretch()  # Adiciona espaço antes do botão
-        btn_store_layout.addWidget(btn_store)
-        btn_store_layout.addStretch()  # Adiciona espaço depois do botão
-        main_layout.addLayout(btn_store_layout)
-
-        # Adiciona o layout principal a um widget para o QScrollArea
-        container_widget = QWidget()
-        container_widget.setLayout(main_layout)
-
-        # Cria uma área de rolagem
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setWidget(container_widget)
-
-        # Define o layout da janela
-        window_layout = QVBoxLayout()
-        window_layout.addWidget(scroll_area)
-        self.setLayout(window_layout)
-
-    def perform_search(self):
-        # Obtém o termo de pesquisa e o caminho do driver JDBC
-        search_term = self.search_input.text()
-        path_drive = r'./ARQUIVOS/Oracle_Jdbc/ojdbc8.jar'
-
-        if search_term:
-            try:
-                # Instancia a classe JdbcPermission
-                jdbc_permission = JdbcPermission_descred(path_drive)
-                #jdbc_permission = None
-
-                # Usa o método fetch_data para buscar os dados
-                #self.df_search, protocol = jdbc_permission.fetch_data(protocol=search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search)
-                self.df_search = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term)
-                protocol = search_term
-
-                self.label_status.setText(f"{len(self.df_search)} linhas carregadas.")
-                # Atualiza o self.df_search com os dados encontrados
-                #self.df_search = df
-
-                # Define o número de linhas e colunas da tabela com base no DataFrame
-                self.table.setRowCount(len(self.df_search))
-                self.table.setColumnCount(len(self.df_search.columns))
-                self.table.setHorizontalHeaderLabels(self.df_search.columns)
-
-                # Preenche a tabela com os dados do DataFrame
-                for row_idx, row_data in self.df_search.iterrows():
-                    for col_idx, cell_data in enumerate(row_data):
-                        self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(cell_data)))
-
-                if self.df_search.empty:
-                    QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
-
-            except Exception as erro:
-                QMessageBox.critical(self, "Erro", f"Erro ao buscar dados:\n{str(erro)}")
-        else:
-            QMessageBox.warning(self, "Aviso", "Digite um termo para pesquisar!")
-
-    def store_information(self):
-        # Verifica se há dados no DataFrame
-        if self.df_search.empty:
-            QMessageBox.warning(self, "Aviso", "Nenhuma informação foi encontrada para armazenar!")
-            return None
-
-        # Exibe uma mensagem de sucesso e retorna o DataFrame
-        QMessageBox.information(self, "Informação", "Informação armazenada com sucesso!")
-        return self.df_search
