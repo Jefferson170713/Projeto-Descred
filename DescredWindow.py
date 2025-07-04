@@ -107,7 +107,8 @@ class DescredWindow:
         # Campo de pesquisa e botão para Descredenciado
         search_layout_desc = QHBoxLayout()
         self.search_input_descredenciado = QLineEdit()
-        self.search_input_descredenciado.setPlaceholderText("Digite os protocolos para Descredenciado...")
+        self.search_input_descredenciado.setFixedSize(30)
+        self.search_input_descredenciado.setPlaceholderText("Digite o(s) CD_PESSOA para DESCREDENCIADO...")
         search_layout_desc.addWidget(self.search_input_descredenciado)
         
         btn_search_desc = QPushButton("Buscar")
@@ -172,7 +173,8 @@ class DescredWindow:
         # Campo de pesquisa e botão para Substituto
         search_layout_sub = QHBoxLayout()
         self.search_input_substituto = QLineEdit()
-        self.search_input_substituto.setPlaceholderText("Digite os protocolos para Substituto...")
+        self.search_input_substituto.setFixedSize(300, 30)
+        self.search_input_substituto.setPlaceholderText("Digite o(s) CD_PESSOA para o SUBSTITUTO...")
         search_layout_sub.addWidget(self.search_input_substituto)
         
         btn_search_sub = QPushButton("Buscar")
@@ -290,7 +292,7 @@ class DescredWindow:
                     list_empresa = ', '.join(map(str, list_empresa))
                 
                 if not list_empresa:
-                    QMessageBox.warning(self.parent, "AVISO - DESCREDENCIADO", "Por favor, selecione pelo menos uma empresa.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
+                    QMessageBox.warning(self.parent, "AVISO - DESCREDENCIADO", "Por favor, selecione pelo menos uma operadora.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
                     return
                     
                 # Instancia a classe JdbcPermission
@@ -313,7 +315,7 @@ class DescredWindow:
             except Exception as error:
                 QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
         else:
-            QMessageBox.warning(self.parent, "Aviso", "Por favor, insira um termo de pesquisa válido.")
+            QMessageBox.warning(self.parent, "AVISO - DESCREDENCIADO", "Por favor, insira um termo de pesquisa válido.")
     
     def search_substituto(self):
         search_term = self.search_input_substituto.text()
@@ -336,7 +338,7 @@ class DescredWindow:
                     list_empresa = ', '.join(map(str, list_empresa))
                 
                 if not list_empresa:
-                    QMessageBox.warning(self.parent, "AVISO - SUBSTITUTO", "Por favor, selecione pelo menos uma empresa.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
+                    QMessageBox.warning(self.parent, "AVISO - SUBSTITUTO", "Por favor, selecione pelo menos uma operadora.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
                     return
                     
                 # Instancia a classe JdbcPermission
@@ -359,7 +361,7 @@ class DescredWindow:
             except Exception as error:
                 QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
         else:
-            QMessageBox.warning(self.parent, "Aviso", "Por favor, insira um termo de pesquisa válido.")
+            QMessageBox.warning(self.parent, "AVISO - SUBSTITUTO", "Por favor, insira um termo de pesquisa válido.")
     
     # Função para processar dados
     def process_data(self):
