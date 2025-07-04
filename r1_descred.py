@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QWidget
 class R1Descred(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("DESCRED")
+        self.setWindowTitle("Descredenciamento Total")
         self.setGeometry(100, 100, 500, 600)
         self.setWindowIcon(QIcon(r'./Arquivos/logo/logo.ico'))
         self.r1_descred = QTabWidget()
