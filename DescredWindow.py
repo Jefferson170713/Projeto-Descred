@@ -107,7 +107,7 @@ class DescredWindow:
         # Campo de pesquisa e botão para Descredenciado
         search_layout_desc = QHBoxLayout()
         self.search_input_descredenciado = QLineEdit()
-        self.search_input_descredenciado.setFixedSize(30)
+        self.search_input_descredenciado.setFixedHeight(30)
         self.search_input_descredenciado.setPlaceholderText("Digite o(s) CD_PESSOA para DESCREDENCIADO...")
         search_layout_desc.addWidget(self.search_input_descredenciado)
         
@@ -173,7 +173,7 @@ class DescredWindow:
         # Campo de pesquisa e botão para Substituto
         search_layout_sub = QHBoxLayout()
         self.search_input_substituto = QLineEdit()
-        self.search_input_substituto.setFixedSize(300, 30)
+        self.search_input_substituto.setFixedHeight(30)
         self.search_input_substituto.setPlaceholderText("Digite o(s) CD_PESSOA para o SUBSTITUTO...")
         search_layout_sub.addWidget(self.search_input_substituto)
         
