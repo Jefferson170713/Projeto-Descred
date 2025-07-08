@@ -299,6 +299,7 @@ class DescredWindow:
                 jdbc_permission = JdbcPermission_descred(path_drive)
                 # Usa o método fetch_data para buscar os dados
                 self.df_search_descredenciado = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term, progress_bar=self.progress_bar_process_descredenciado, list_empresa=list_empresa)
+                self.df_search_descredenciado = self.initial_treatment(self.df_search_descredenciado)
                 number_of_lines = self.format_int(len(self.df_search_descredenciado))
                 self.label_status_descredenciado.setText(f"{number_of_lines} linhas carregadas - Descredenciado.")
                 
@@ -316,6 +317,22 @@ class DescredWindow:
                 QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
         else:
             QMessageBox.warning(self.parent, "AVISO - DESCREDENCIADO", "Por favor, insira um termo de pesquisa válido.")
+            
+    def initial_treatment(self, df):
+        # Tratamento inicial dos dados
+        df.CD_TIPO_REDE_ATENDIMENTO = df.CD_TIPO_REDE_ATENDIMENTO.fillna('-').astype(str).replace('.0', '')
+        df.CD_PROCEDIMENTO = df.CD_PROCEDIMENTO.fillna('-').astype(str).replace('.0', '')
+        df.PROCEDIMENTO_TUSS = df.PROCEDIMENTO_TUSS.fillna('-').astype(str).str.replace('.0', '')
+        df.FL_CONSULTA = df.FL_CONSULTA.fillna('-').astype(str).replace('.0', '')
+        df.FL_EXAME = df.FL_EXAME.fillna('-').astype(str).replace('.0', '')
+        df.FL_TRATAMENTO = df.FL_TRATAMENTO.fillna('-').astype(str).replace('.0', '')
+        df.FL_PQA = df.FL_PQA.fillna('-').astype(str).replace('.0', '')
+        df.FL_INTERNACAO = df.FL_INTERNACAO.fillna('-').astype(str).replace('.0', '')
+        df.FL_SERVICO = df.FL_SERVICO.fillna('-').astype(str).replace('.0', '')
+        df.FL_PE = df.FL_PE.fillna('-').astype(str).replace('.0', '')
+        # Criando a coluna de Key_consulta
+        df['CONCAT_CONSULTA'] = df.FL_CONSULTA.astype(str) + '_' + df.FL_EXAME.astype(str) + '_' + df.FL_TRATAMENTO.astype(str) + '_' + df.FL_PQA.astype(str) + '_' + df.FL_INTERNACAO.astype(str) + '_' + df.FL_SERVICO.astype(str)
+        return df
     
     def search_substituto(self):
         search_term = self.search_input_substituto.text()
@@ -345,6 +362,7 @@ class DescredWindow:
                 jdbc_permission = JdbcPermission_descred(path_drive)
                 # Usa o método fetch_data para buscar os dados
                 self.df_search_substituto = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term, progress_bar=self.progress_bar_process_substituto, list_empresa=list_empresa)
+                self.df_search_substituto = self.initial_treatment(self.df_search_substituto)
                 number_of_lines = self.format_int(len(self.df_search_substituto))
                 self.label_status_substituto.setText(f"{number_of_lines} linhas carregadas - Substituto.")
                 
