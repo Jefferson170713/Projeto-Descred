@@ -20,6 +20,8 @@ from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QGroupBox
 import os
 import itertools
+import numpy as np
+import time
 import locale
 # Configura a localidade para o formato brasileiro
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -32,8 +34,8 @@ class DescredWindow:
         self.parent = parent
         self.file_path = None
         self.output_path = None
-        self.df_descredenciado = pd.DataFrame()
-        self.df_substituto = pd.DataFrame()
+        # self.df_descredenciado = pd.DataFrame()
+        # self.df_substituto = pd.DataFrame()
         self.progress_bar_process_descredenciado = None
         self.progress_bar_process_substituto = None
         self.df_search = pd.DataFrame()  # DataFrame para armazenar os dados pesquisados
@@ -219,7 +221,7 @@ class DescredWindow:
     
     # Função para processar e salvar o arquivo
     def process_and_save(self):
-        if self.df_search.empty:
+        if ( self.df_search_descredenciado.empty) or ( self.df_search_substituto.empty ):
             QMessageBox.warning(self.parent, "Aviso", "Nenhum dado carregado para salvar!")
             return
 
@@ -230,30 +232,22 @@ class DescredWindow:
         )
         if not folder:
             return  # Usuário cancelou
-
+        #  Add a função create_columns_key para criar as colunas de chave aqui
+        ...
         # Gera o nome do arquivo automaticamente
-        protocolo = str(self.df_search['CD_PROTOCOLO'].iloc[0])
-        file_name = f"PROTOCOLO_{protocolo}.xlsx"
+        cd_pessoa = str(self.df_search_descredenciado['CD_PESSOA'].iloc[0])
+        date = self.pegar_data_atual()
+        file_name = f"DESCREDENCIADO_{cd_pessoa}_{date}.csv"
         save_path = os.path.join(folder, file_name)
 
         try:
-            # self.df_search = self.adjust_values()
-            # self.progress_bar_process.setValue(20)
-            # self.df_search = self.creating_the_master_key()
-            # self.progress_bar_process.setValue(45)
-            # self.df_search = self.grouping_the_networks()
-            # self.progress_bar_process.setValue(75)
-            # self.df_search = self.breaking_the_primary_key_into_columns()
-            # self.progress_bar_process.setValue(95)
-
-            # self.save_to_excel(self.df_search, save_path)
-
-            self.progress_bar_process.setValue(100)
-            self.label_status_win_one.setText(f"{self.df_search.shape[0]} linhas carregadas e salvas no arquivo Excel.")
-            #QMessageBox.information(self.parent, "Sucesso", f"Arquivo salvo em:\n{save_path}")
+            ...
         except Exception as erro:
             QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao salvar o arquivo:\n{str(erro)}")
     
+    def pegar_data_atual(self):
+        # Pega a data atual no formato dd_mm_yyyy
+        return time.strftime("%d_%m_%Y")
 
     # Funções para limpar status específicos
     def clear_status_descredenciado(self):
@@ -396,6 +390,19 @@ class DescredWindow:
                 QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
         else:
             QMessageBox.warning(self.parent, "AVISO - SUBSTITUTO", "Por favor, insira um termo de pesquisa válido.")
+    
+    def create_columns_key(self):
+        # Criar a coluna KEY_PROCEDIMENTO_REDE para ambos os DataFrames
+        self.df_search_descredenciado['KEY_PROCEDIMENTO_REDE'] = self.df_search_descredenciado['PROCEDIMENTO_TUSS'].astype(str) + '_' + self.df_search_descredenciado['CD_TIPO_REDE_ATENDIMENTO'].astype(str)
+        self.df_search_substituto['KEY_PROCEDIMENTO_REDE'] = self.df_search_substituto['PROCEDIMENTO_TUSS'].astype(str) + '_' + self.df_search_substituto['CD_TIPO_REDE_ATENDIMENTO'].astype(str)
+        # Criar um dicionário de mapeamento primeiro
+        dict_rede_regime = self.df_search_substituto.set_index('KEY_PROCEDIMENTO_REDE')['REDE_CONSULTA'].to_dict()
+        dict_regime = self.df_search_substituto.set_index('KEY_PROCEDIMENTO_REDE')['TIPO_CONSULTA'].to_dict()
+
+        # Usar map() para fazer o mapeamento correto
+        self.df_search_descredenciado['KEY_REDE_REGIME'] = self.df_search_descredenciado['KEY_PROCEDIMENTO_REDE'].map(dict_rede_regime).fillna('')
+        self.df_search_descredenciado['KEY_TIPO_CONSULTA_SUBS'] = self.df_search_descredenciado['KEY_PROCEDIMENTO_REDE'].map(dict_regime).fillna('')
+        
     
     # Função para processar dados
     def process_data(self):
