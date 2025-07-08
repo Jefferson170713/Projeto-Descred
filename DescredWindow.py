@@ -34,7 +34,7 @@ class DescredWindow:
         self.parent = parent
         self.file_path = None
         self.output_path = None
-        # self.df_descredenciado = pd.DataFrame()
+        # self.self.df_search_descredenciadoenciado = pd.DataFrame()
         # self.df_substituto = pd.DataFrame()
         self.progress_bar_process_descredenciado = None
         self.progress_bar_process_substituto = None
@@ -233,7 +233,9 @@ class DescredWindow:
         if not folder:
             return  # Usuário cancelou
         #  Add a função create_columns_key para criar as colunas de chave aqui
-        ...
+        self.create_columns_key()
+        
+        
         # Gera o nome do arquivo automaticamente
         cd_pessoa = str(self.df_search_descredenciado['CD_PESSOA'].iloc[0])
         date = self.pegar_data_atual()
@@ -241,7 +243,10 @@ class DescredWindow:
         save_path = os.path.join(folder, file_name)
 
         try:
-            ...
+            #salvando no formato CSV em save_path
+            self.df_search_descredenciado.to_csv(save_path, sep=';', encoding='latin1', index=False)
+            # lançando uma mensagem de sucesso
+            QMessageBox.information(self.parent, "Sucesso", f"Arquivo salvo com sucesso em:\n{save_path}")
         except Exception as erro:
             QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao salvar o arquivo:\n{str(erro)}")
     
@@ -403,7 +408,105 @@ class DescredWindow:
         self.df_search_descredenciado['KEY_REDE_REGIME'] = self.df_search_descredenciado['KEY_PROCEDIMENTO_REDE'].map(dict_rede_regime).fillna('')
         self.df_search_descredenciado['KEY_TIPO_CONSULTA_SUBS'] = self.df_search_descredenciado['KEY_PROCEDIMENTO_REDE'].map(dict_regime).fillna('')
         
+        # Aplicando a função para criar a coluna STATUS_REGIME
+        self.df_search_descredenciado['STATUS_REGIME'] = self.df_search_descredenciado.apply(self.avaliar_status_regime, axis=1)
+        # criando as colunas de status
+        self.df_search_descredenciado['STATUS_KEY_PROCEDIMENTO_REDE'] = np.where(self.df_search_descredenciado['KEY_PROCEDIMENTO_REDE'].isin(self.df_search_substituto['KEY_PROCEDIMENTO_REDE']), 'SIM', 'NAO')
+        self.df_search_descredenciado['STATUS_PROCEDIMENTO_TUSS'] = np.where(self.df_search_descredenciado['PROCEDIMENTO_TUSS'].isin(self.df_search_substituto['PROCEDIMENTO_TUSS']), 'SIM', 'NAO')
+        self.df_search_descredenciado['STATUS_REDE'] = np.where(self.df_search_descredenciado['CD_TIPO_REDE_ATENDIMENTO'].isin(self.df_search_substituto['CD_TIPO_REDE_ATENDIMENTO']), 'SIM', 'NAO')
+        # Aplicando a função
+        self.df_search_descredenciado['ATENDIMENTO'] = self.criar_coluna_atendimento(
+            self.df_search_descredenciado['TIPO_CONSULTA'], 
+            self.df_search_descredenciado['KEY_TIPO_CONSULTA_SUBS']
+        )
+        
+    def criar_coluna_atendimento(self, tipo_consulta_series, key_tipo_consulta_subs_series):
+        # Convertendo para arrays numpy para melhor performance
+        tipo_consulta = tipo_consulta_series.values
+        key_tipo_consulta_subs = key_tipo_consulta_subs_series.values
+        
+        # Definindo as condições usando numpy
+        conditions = [
+            # T -> T = TOTAL
+            (tipo_consulta == 'T') & (key_tipo_consulta_subs == 'T'),
+            # T -> E = PARCIAL
+            (tipo_consulta == 'T') & (key_tipo_consulta_subs == 'E'),
+            # T -> U = PARCIAL
+            (tipo_consulta == 'T') & (key_tipo_consulta_subs == 'U'),
+            # E -> E = TOTAL
+            (tipo_consulta == 'E') & (key_tipo_consulta_subs == 'E'),
+            # E -> T = TOTAL
+            (tipo_consulta == 'E') & (key_tipo_consulta_subs == 'T'),
+            # E -> U = NAO
+            (tipo_consulta == 'E') & (key_tipo_consulta_subs == 'U'),
+            # U -> U = TOTAL
+            (tipo_consulta == 'U') & (key_tipo_consulta_subs == 'U'),
+            # U -> T = TOTAL
+            (tipo_consulta == 'U') & (key_tipo_consulta_subs == 'T'),
+            # U -> E = NAO
+            (tipo_consulta == 'U') & (key_tipo_consulta_subs == 'E')
+        ]
+        # Definindo as escolhas correspondentes
+        choices = [
+            'TOTAL',    # T -> T
+            'PARCIAL',  # T -> E
+            'PARCIAL',  # T -> U
+            'TOTAL',    # E -> E
+            'TOTAL',    # E -> T
+            'NAO',      # E -> U
+            'TOTAL',    # U -> U
+            'TOTAL',    # U -> T
+            'NAO'       # U -> E
+        ]
+        # Usando numpy.select para aplicar as condições de forma vectorizada
+        # default='NAO' para casos não cobertos (valores vazios, etc.)
+        resultado = np.select(conditions, choices, default='NAO')
+        
+        # Convertendo de volta para série pandas
+        return pd.Series(resultado, index=tipo_consulta_series.index)
     
+    # Função para avaliar o STATUS_REGIME baseado nas regras definidas
+    def avaliar_status_regime(self, row):
+        tipo_consulta = row['TIPO_CONSULTA']
+        tipo_consulta_subs = row['KEY_TIPO_CONSULTA_SUBS']
+        rede_consulta = row['REDE_CONSULTA']
+        key_rede_regime = row['KEY_REDE_REGIME']
+        
+        # Se não há correspondência na chave substituto, retorna NAO
+        if pd.isna(tipo_consulta_subs) or tipo_consulta_subs == '':
+            return 'NAO'
+        
+        # Situação 1: TIPO_CONSULTA = T (T tem precedência total)
+        if tipo_consulta == 'T':
+            # Se substituto também é T, verifica se são iguais
+            if tipo_consulta_subs == 'T':
+                return 'SIM' if rede_consulta == key_rede_regime else 'SIM'  # T->T sempre SIM
+            # Se substituto é E ou U, verifica se KEY_REDE_REGIME está em REDE_CONSULTA
+            elif tipo_consulta_subs in ['E', 'U']:
+                # Como T gera múltiplas opções (T, E, U), verifica se a opção do substituto está presente
+                return 'SIM' if key_rede_regime in rede_consulta else 'NAO'
+            
+        # Situação 2: TIPO_CONSULTA = E
+        elif tipo_consulta == 'E':
+            # Se substituto também é E, verifica se são iguais
+            if tipo_consulta_subs == 'E':
+                return 'SIM' if rede_consulta == key_rede_regime else 'SIM'  # E->E sempre SIM
+            # Se substituto é T ou U, não há compatibilidade
+            else:
+                return 'NAO'
+        
+        # Situação 3: TIPO_CONSULTA = U
+        elif tipo_consulta == 'U':
+            # Se substituto também é U, verifica se são iguais
+            if tipo_consulta_subs == 'U':
+                return 'SIM' if rede_consulta == key_rede_regime else 'SIM'  # U->U sempre SIM
+            # Se substituto é T ou E, não há compatibilidade
+            else:
+                return 'NAO'
+        
+        # Caso não se encaixe em nenhuma situação
+        return 'NAO'
+
     # Função para processar dados
     def process_data(self):
         # Você implementará esta função
