@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import QTextEdit
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QGroupBox
 import os
+import itertools
 import locale
 # Configura a localidade para o formato brasileiro
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -278,6 +279,8 @@ class DescredWindow:
         if search_term:
             try:
                 list_empresa = []
+                dict_consulta = {}
+                
                 if self.checkbox_desc_1.isChecked():
                     list_empresa.append('1')
                 if self.checkbox_desc_2.isChecked():
@@ -313,6 +316,10 @@ class DescredWindow:
                         item = QTableWidgetItem(str(value))
                         self.table_descredenciado.setItem(row_idx, col_idx, item)
 
+                dict_consulta = self.regime_exchange(dict_consulta)
+                self.df_search_descredenciado['TIPO_CONSULTA'] = self.df_search_descredenciado.CONCAT_CONSULTA.map(dict_consulta)
+                self.df_search_descredenciado['REDE_CONSULTA'] = self.df_search_descredenciado.CD_TIPO_REDE_ATENDIMENTO.astype(str) + '_' + self.df_search_descredenciado.TIPO_CONSULTA.astype(str)
+                
             except Exception as error:
                 QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
         else:
@@ -350,7 +357,7 @@ class DescredWindow:
                 if self.checkbox_sub_4.isChecked():
                     list_empresa.append('10')
                 if self.checkbox_sub_5.isChecked():
-                    list_empresa.append('10')
+                    list_empresa.append('14')
                 else:
                     list_empresa = ', '.join(map(str, list_empresa))
                 
@@ -386,6 +393,32 @@ class DescredWindow:
         # Você implementará esta função
         pass
     
+    def regime_exchange(self, dic_consulta):
+       # Caracteres possíveis para cada posição
+        opcoes_1 = ['T', '-']
+        opcoes_2 = ['E', '-']
+        opcoes_3 = ['U', '-']
+        # Gerando todas as combinações de 6 posições
+        combinacoes_1 = list(itertools.product(opcoes_1, repeat=6))
+        combinacoes_2 = list(itertools.product(opcoes_2, repeat=6))
+        combinacoes_3 = list(itertools.product(opcoes_3, repeat=6))
+        # Criando o dicionário
+        dic_consulta_1 = {
+        '_'.join(comb): 'T' for comb in combinacoes_1
+        }
+        dic_consulta_2 = {
+        '_'.join(comb): 'E' for comb in combinacoes_2
+        }
+        dic_consulta_3 = {
+        '_'.join(comb): 'U' for comb in combinacoes_3
+        }
+        # excluiindo a combinação que tem todos os valores como '-'
+        dic_consulta_1.pop('-_-_-_-_-_-', None)
+        dic_consulta_2.pop('-_-_-_-_-_-', None)
+        dic_consulta_3.pop('-_-_-_-_-_-', None)
+        # criando um dicionário que junta os três dicionários 
+        dic_consulta = {**dic_consulta_1, **dic_consulta_2, **dic_consulta_3}
+        return dic_consulta
     
     def save_to_excel(self, df, file_path):
         ...
