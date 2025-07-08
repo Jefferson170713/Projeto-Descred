@@ -278,8 +278,8 @@ class DescredWindow:
         
         if search_term:
             try:
-                list_empresa = []
                 dict_consulta = {}
+                list_empresa = []
                 
                 if self.checkbox_desc_1.isChecked():
                     list_empresa.append('1')
@@ -319,6 +319,8 @@ class DescredWindow:
                 dict_consulta = self.regime_exchange(dict_consulta)
                 self.df_search_descredenciado['TIPO_CONSULTA'] = self.df_search_descredenciado.CONCAT_CONSULTA.map(dict_consulta)
                 self.df_search_descredenciado['REDE_CONSULTA'] = self.df_search_descredenciado.CD_TIPO_REDE_ATENDIMENTO.astype(str) + '_' + self.df_search_descredenciado.TIPO_CONSULTA.astype(str)
+                self.df_search_descredenciado['REDE_CONSULTA'] = self.df_search_descredenciado.apply(self.generate_query_network, axis=1)
+                print(self.df_search_descredenciado.head())
                 
             except Exception as error:
                 QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
@@ -347,6 +349,7 @@ class DescredWindow:
         
         if search_term:
             try:
+                dict_consulta = {}
                 list_empresa = []
                 if self.checkbox_sub_1.isChecked():
                     list_empresa.append('1')
@@ -382,6 +385,12 @@ class DescredWindow:
                     for col_idx, value in enumerate(row_data):
                         item = QTableWidgetItem(str(value))
                         self.table_substituto.setItem(row_idx, col_idx, item)
+                
+                dict_consulta = self.regime_exchange(dict_consulta)
+                self.df_search_substituto['TIPO_CONSULTA'] = self.df_search_substituto.CONCAT_CONSULTA.map(dict_consulta)
+                self.df_search_substituto['REDE_CONSULTA'] = self.df_search_substituto.CD_TIPO_REDE_ATENDIMENTO.astype(str) + '_' + self.df_search_substituto.TIPO_CONSULTA.astype(str)
+                self.df_search_substituto['REDE_CONSULTA'] = self.df_search_substituto.apply(self.generate_query_network, axis=1)
+                #print(self.df_search_substituto.head())
 
             except Exception as error:
                 QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
@@ -419,6 +428,15 @@ class DescredWindow:
         # criando um dicionário que junta os três dicionários 
         dic_consulta = {**dic_consulta_1, **dic_consulta_2, **dic_consulta_3}
         return dic_consulta
+    
+    def generate_query_network(self, row):
+        rede = row['CD_TIPO_REDE_ATENDIMENTO']
+        tipo = row['TIPO_CONSULTA']
+        if tipo == 'T':
+            # Retorna string com todas as opções separadas por vírgula
+            return f'{rede}_T, {rede}_E, {rede}_U'
+        else:
+            return f'{rede}_{tipo}'
     
     def save_to_excel(self, df, file_path):
         ...
