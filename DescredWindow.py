@@ -108,7 +108,7 @@ class DescredWindow:
         search_layout_desc = QHBoxLayout()
         self.search_input_descredenciado = QLineEdit()
         self.search_input_descredenciado.setFixedHeight(30)
-        self.search_input_descredenciado.setPlaceholderText("Digite o(s) CD_PESSOA para DESCREDENCIADO...")
+        self.search_input_descredenciado.setPlaceholderText("Digite o(s) CD_PESSOA para o DESCREDENCIADO...")
         search_layout_desc.addWidget(self.search_input_descredenciado)
         
         btn_search_desc = QPushButton("Buscar")
@@ -196,13 +196,13 @@ class DescredWindow:
         button_layout = QHBoxLayout()
         
         # Botão para processar dados
-        btn_process = QPushButton("Processar")
-        btn_process.setFixedSize(150, 35)
-        btn_process.clicked.connect(self.process_data)
-        button_layout.addWidget(btn_process)
+        # btn_process = QPushButton("Processar")
+        # btn_process.setFixedSize(150, 35)
+        # btn_process.clicked.connect(self.process_data)
+        # button_layout.addWidget(btn_process)
         
         # Adiciona um espaço expansível entre os botões
-        button_layout.addStretch()
+        #button_layout.addStretch()
         
         # Botão para salvar
         btn_save = QPushButton("Salvar")
@@ -287,7 +287,7 @@ class DescredWindow:
                 if self.checkbox_desc_4.isChecked():
                     list_empresa.append('10')
                 if self.checkbox_desc_5.isChecked():
-                    list_empresa.append('10')
+                    list_empresa.append('14')
                 else:
                     list_empresa = ', '.join(map(str, list_empresa))
                 
