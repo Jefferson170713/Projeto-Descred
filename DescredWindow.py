@@ -10,12 +10,8 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtWidgets import QLineEdit
-# from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QTableWidget
 from PyQt5.QtWidgets import QTableWidgetItem
-# from PyQt5.QtWidgets import QScrollArea
-# from PyQt5.QtWidgets import QWidget
-# from PyQt5.QtWidgets import QTextEdit
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QGroupBox
 import os
@@ -25,7 +21,6 @@ import time
 import locale
 # Configura a localidade para o formato brasileiro
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-# from Arquivos.Oracle_jdbc.script_jdbc_descred import JdbcPermission_descred
 from DescredJdbcPermission import JdbcPermissionDescred  
 
 class DescredWindow:
