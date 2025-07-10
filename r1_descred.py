@@ -38,6 +38,7 @@ class R1Descred(QMainWindow):
         self.procedure_descred.create_descred_window(self.provider_descred)
         # self.procedure_package_process.create_procedures_and_package_tab(self.provider_descred)
         # self.center_clinic_process.create_center_clinic_tab(self.center_clinic)
+        # Teste Jefferson
 
 
 # Loop do programa em funcionamento
