@@ -66,7 +66,7 @@ Anteriormente, o processo de descredenciamento era realizado manualmente:
 
 ### 1. Clone o Repositório
 ```bash
-git clone https://github.com/seu-usuario/descred.git
+git clone https://github.com/Jefferson170713/descred.git
 cd descred
 ```
 
@@ -173,16 +173,41 @@ Este sistema foi desenvolvido especificamente para as **equipes R1 e R2** do set
 
 Este projeto foi desenvolvido com a colaboração especial da **Equipe R1**, através de múltiplas reuniões para compreensão detalhada dos processos de análise e requisitos específicos do negócio.
 
+## 🚀 **Comandos Git para Publicação:**
+
+1. **Subir para o GitHub:**
+   ```bash
+   git init
+   git add .
+   git commit -m "feat: Sistema de automação para descredenciamento de prestadores"
+   git remote add origin https://github.com/Jefferson170713/descred.git
+   git push -u origin main
+   ```
+
+2. **Post Sugerido para LinkedIn:**
+   ```
+   🚀 Acabei de publicar no GitHub um projeto que reduziu em 88% o tempo de processamento de descredenciamento de prestadores médicos!
+   
+   ⚡ De 30 minutos para 3,5 minutos
+   🤖 Automação completa com Python + PyQt5
+   📊 Análise inteligente de compatibilidade
+   🏥 Impacto direto na área da saúde
+   
+   Projeto disponível em: https://github.com/Jefferson170713/descred
+   
+   #Python #Automação #Healthcare #DataScience #PyQt5 #Oracle #ProcessOptimization
+   ```
+
 ## 📄 Licença
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ## 👨‍💻 Autor
 
-**Jefferson** - Desenvolvedor Python | Especialista em Automação de Processos
+**Jefferson de Almeida** - Desenvolvedor Python | Especialista em Automação de Processos
 
-[![LinkedIn](https://img.shields.io/badge/-LinkedIn-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/seu-perfil)
-[![GitHub](https://img.shields.io/badge/-GitHub-black?style=flat-square&logo=Github&logoColor=white)](https://github.com/seu-usuario)
+[![LinkedIn](https://img.shields.io/badge/-LinkedIn-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/jefferson-de-almeida-a60b18125/)
+[![GitHub](https://img.shields.io/badge/-GitHub-black?style=flat-square&logo=Github&logoColor=white)](https://github.com/Jefferson170713)
 
 ---
 
