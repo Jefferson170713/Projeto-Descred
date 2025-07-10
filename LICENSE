@@ -33,3 +33,6 @@ DESENVOLVEDOR:
 Jefferson de Almeida
 GitHub: https://github.com/Jefferson170713
 LinkedIn: https://www.linkedin.com/in/jefferson-de-almeida-a60b18125/
+
+
+pyinstaller --noconfirm --onefile --windowed --icon=Arquivos\logo\logo_01_descred_ico.ico --add-data "Arquivos\logo\logo_01_descred_ico.ico;Arquivos\logo" --add-data "Arquivos\logo\logo_01_descred_ico.ico;Arquivos\logo" .\Descred.py
