@@ -270,8 +270,8 @@ class DescredWindow:
                     list_empresa.append('10')
                 if self.checkbox_desc_5.isChecked():
                     list_empresa.append('14')
-                else:
-                    list_empresa = ', '.join(map(str, list_empresa))
+                
+                list_empresa = ', '.join(map(str, list_empresa))
                 
                 if not list_empresa:
                     QMessageBox.warning(self.parent, "AVISO - DESCREDENCIADO", "Por favor, selecione pelo menos uma operadora.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
@@ -340,8 +340,8 @@ class DescredWindow:
                     list_empresa.append('10')
                 if self.checkbox_sub_5.isChecked():
                     list_empresa.append('14')
-                else:
-                    list_empresa = ', '.join(map(str, list_empresa))
+                
+                list_empresa = ', '.join(map(str, list_empresa))
                 
                 if not list_empresa:
                     QMessageBox.warning(self.parent, "AVISO - SUBSTITUTO", "Por favor, selecione pelo menos uma operadora.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
