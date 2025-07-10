@@ -10,12 +10,12 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtWidgets import QLineEdit
-from PyQt5.QtWidgets import QDialog
+# from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QTableWidget
 from PyQt5.QtWidgets import QTableWidgetItem
-from PyQt5.QtWidgets import QScrollArea
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QTextEdit
+# from PyQt5.QtWidgets import QScrollArea
+# from PyQt5.QtWidgets import QWidget
+# from PyQt5.QtWidgets import QTextEdit
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QGroupBox
 import os
@@ -25,8 +25,6 @@ import time
 import locale
 # Configura a localidade para o formato brasileiro
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-#from SearchWindow import SearchWindow
-#from ARQUIVOS.Oracle_Jdbc.jdbc_teste_02 import JdbcPermission 
 from Arquivos.Oracle_jdbc.script_jdbc_descred import JdbcPermission_descred
 
 class DescredWindow:
@@ -34,8 +32,6 @@ class DescredWindow:
         self.parent = parent
         self.file_path = None
         self.output_path = None
-        # self.self.df_search_descredenciadoenciado = pd.DataFrame()
-        # self.df_substituto = pd.DataFrame()
         self.progress_bar_process_descredenciado = None
         self.progress_bar_process_substituto = None
         self.df_search = pd.DataFrame()  # DataFrame para armazenar os dados pesquisados
@@ -198,17 +194,9 @@ class DescredWindow:
         # Layout horizontal para os botões finais
         button_layout = QHBoxLayout()
         
-        # Botão para processar dados
-        # btn_process = QPushButton("Processar")
-        # btn_process.setFixedSize(150, 35)
-        # btn_process.clicked.connect(self.process_data)
-        # button_layout.addWidget(btn_process)
-        
-        # Adiciona um espaço expansível entre os botões
-        #button_layout.addStretch()
         
         # Botão para salvar
-        btn_save = QPushButton("Salvar")
+        btn_save = QPushButton("Processar e Salvar")
         btn_save.setFixedSize(150, 35)
         btn_save.clicked.connect(self.process_and_save)
         button_layout.addWidget(btn_save)
@@ -256,18 +244,14 @@ class DescredWindow:
 
     # Funções para limpar status específicos
     def clear_status_descredenciado(self):
-        # função para limpar o status de Descredenciado
         self.progress_bar_process_descredenciado.setValue(0)
         self.label_status_descredenciado.setText("Nenhum arquivo carregado - Descredenciado.")
-        # limpando a tabela e deixando completamente em branco novamente
         self.table_descredenciado.setRowCount(0)
         
     # Função para limpar o status de Substituto  
     def clear_status_substituto(self):
-        # função para limpar o status de Substituto
         self.progress_bar_process_substituto.setValue(0)
         self.label_status_substituto.setText("Nenhum arquivo carregado - Substituto.")
-        # limpando a tabela e deixando completamente em branco novamente
         self.table_substituto.setRowCount(0)
     
     # Funções de pesquisa
@@ -506,11 +490,6 @@ class DescredWindow:
         
         # Caso não se encaixe em nenhuma situação
         return 'NAO'
-
-    # Função para processar dados
-    def process_data(self):
-        # Você implementará esta função
-        pass
     
     def regime_exchange(self, dic_consulta):
        # Caracteres possíveis para cada posição
@@ -547,9 +526,6 @@ class DescredWindow:
             return f'{rede}_T, {rede}_E, {rede}_U'
         else:
             return f'{rede}_{tipo}'
-    
-    def save_to_excel(self, df, file_path):
-        ...
         
     def format_int(self, value):
         return locale.format_string('%.f', value, grouping=True)
