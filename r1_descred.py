@@ -40,8 +40,6 @@ class R1Descred(QMainWindow):
         # self.center_clinic_process.create_center_clinic_tab(self.center_clinic)
         # Teste Jefferson
 
-
-
 # Loop do programa em funcionamento
 def main():
     app = QApplication(sys.argv)
