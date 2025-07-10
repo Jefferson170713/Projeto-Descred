@@ -25,7 +25,8 @@ import time
 import locale
 # Configura a localidade para o formato brasileiro
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-from Arquivos.Oracle_jdbc.script_jdbc_descred import JdbcPermission_descred
+# from Arquivos.Oracle_jdbc.script_jdbc_descred import JdbcPermission_descred
+from DescredJdbcPermission import JdbcPermissionDescred  
 
 class DescredWindow:
     def __init__(self, parent=None):
@@ -282,7 +283,7 @@ class DescredWindow:
                     return
                     
                 # Instancia a classe JdbcPermission
-                jdbc_permission = JdbcPermission_descred(path_drive)
+                jdbc_permission = JdbcPermissionDescred(path_drive)
                 # Usa o método fetch_data para buscar os dados
                 self.df_search_descredenciado = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term, progress_bar=self.progress_bar_process_descredenciado, list_empresa=list_empresa)
                 self.df_search_descredenciado = self.initial_treatment(self.df_search_descredenciado)
@@ -352,7 +353,7 @@ class DescredWindow:
                     return
                     
                 # Instancia a classe JdbcPermission
-                jdbc_permission = JdbcPermission_descred(path_drive)
+                jdbc_permission = JdbcPermissionDescred(path_drive)
                 # Usa o método fetch_data para buscar os dados
                 self.df_search_substituto = jdbc_permission.fetch_data(chunk_size=50000, protocol=search_term, progress_bar=self.progress_bar_process_substituto, list_empresa=list_empresa)
                 self.df_search_substituto = self.initial_treatment(self.df_search_substituto)
