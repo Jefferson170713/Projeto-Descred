@@ -41,5 +41,6 @@ Thumbs.db
 
 *Arquivos
 *.spec
-*POST_LINKEDIN_OTIMIZADO.md
-*POST_LINKEDIN.md
+
+# Ignorar posts do LinkedIn (não devem ir para o repositório público)
+POST_LINKEDIN*.md
